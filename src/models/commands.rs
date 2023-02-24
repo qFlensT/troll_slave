@@ -8,6 +8,7 @@ pub enum Command{
     CommandCursorReverseOff,
     CommandCursorReverseStatus,
     ResponseCursorReverseStatus,
+    ResponsePcInfo,
 }
 
 impl Default for Command {

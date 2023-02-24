@@ -10,3 +10,15 @@ ws = "0.9.2"
 lazy_static = "1.4.0"
 serde_json = "1.0.93"
 serde = { version = "1.0", features = ["derive"] }
+os_info = "3.6.0"
+gethostname = "0.4.1"
+
+[dependencies.windows]
+version = "0.44.0"
+features = [
+    "Data_Xml_Dom",
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_System_Threading",
+    "Win32_UI_WindowsAndMessaging",
+]

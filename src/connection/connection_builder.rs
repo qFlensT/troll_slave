@@ -1,5 +1,6 @@
 use std::{collections::HashMap, time::Duration};
 
+use crate::models::payload::Payload;
 use crate::models::{commands::Command, connection::ConnectionSettings};
 
 use super::connection::Connection;
@@ -7,26 +8,20 @@ use super::send_payload::SendPayload;
 
 #[derive(Clone)]
 pub struct ConnectionBuilder {
-    url: Option<String>,
-    // handles: HashMap<Command, &'static dyn Fn(&'static dyn Fn(Payload), Option<Payload>) -> ()>,
+    url: String,
+    init_payloads: Vec<Payload>,
     handles: HashMap<Command, &'static dyn Fn(SendPayload, Option<String>)>,
     settings: ConnectionSettings,
 }
 
 impl ConnectionBuilder {
-    pub fn builder() -> Self {
+    pub fn builder(url: String) -> Self {
         Self {
-            url: None,
+            url,
+            init_payloads: vec![],
             handles: HashMap::new(),
             settings: ConnectionSettings::default()
         }
-    }
-
-    pub fn url(&self, url: String) -> Self {
-        let mut this = self.clone();
-        this.url = Some(url);
-        
-        this.clone()
     }
 
     pub fn retry_count(&self, count: i32) -> Self{
@@ -49,13 +44,16 @@ impl ConnectionBuilder {
         self.clone()
     }
 
-    pub fn build(&self) -> Result<Connection, String> {
-        if self.url.is_none() {
-            return Err("ConnectionBuilder Error - Url is not set".to_string());
-        }
+    pub fn add_init_payload(&mut self, payload: Payload) -> Self{
+        self.init_payloads.push(payload);
 
+        self.clone()
+    }
+
+    pub fn build(&self) -> Result<Connection, String> {
         Ok(Connection::new(
-            self.url.clone().unwrap(),
+            self.url.clone(),
+            self.init_payloads.clone(),
             self.handles.clone(),
             self.settings
         ))

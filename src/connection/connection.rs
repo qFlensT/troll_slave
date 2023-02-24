@@ -8,17 +8,25 @@ use super::send_payload::SendPayload;
 
 pub struct Connection{
     url: String, 
+    init_payloads: Vec<Payload>,
     handles: HashMap<Command, &'static dyn Fn(SendPayload, Option<String>)>,
     settings: ConnectionSettings
 }
 
 impl Connection {
-    pub fn new(url: String, handles: HashMap<Command, &'static dyn Fn(SendPayload, Option<String>)>, settings: ConnectionSettings) -> Self{
-        Self { url, handles, settings }
+    pub fn new(url: String, init_payloads: Vec<Payload>, handles: HashMap<Command, &'static dyn Fn(SendPayload, Option<String>)>, settings: ConnectionSettings) -> Self{
+        Self { url, init_payloads, handles, settings }
     }
 
     fn try_connect(&self) -> Result<(), String>{
         if let Ok(_) = connect(self.url.clone(), |sender|{
+            for payload in self.init_payloads.clone(){
+                let send = SendPayload::new(sender.clone());
+                if let Err(_) = send.send(payload){
+                    continue;
+                }
+            }
+
             move |msg: ws::Message| {
                 if !msg.is_text(){
                     return sender.close(CloseCode::Normal)
