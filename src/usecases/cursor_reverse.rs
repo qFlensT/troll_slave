@@ -10,11 +10,8 @@ pub fn cursor_reverse_on(){
     let cursor_active = CURSOR_REVERSE_ACTIVE.clone();
 
     if cursor_active.load(Ordering::SeqCst){
-        println!("Cursor reverse already working!");
         return;
     }
-
-    println!("Starting cursor reverse...");
 
     thread::spawn(||{
         cursor_reverse();
@@ -27,11 +24,8 @@ pub fn cursor_reverse_off(){
     let cursor_active = CURSOR_REVERSE_ACTIVE.clone();
 
     if !cursor_active.load(Ordering::SeqCst){
-        println!("Cursor reverse doesn't work anyway!");
         return;
     }
-
-    println!("Stoping cursor reverse...");
 
     cursor_active.store(false, Ordering::SeqCst);
 }
