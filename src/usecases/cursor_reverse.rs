@@ -1,4 +1,4 @@
-use std::{sync::{atomic::{AtomicBool, Ordering}, Arc}, thread};
+use std::{sync::{atomic::{AtomicBool, Ordering}, Arc}, thread, time::Duration};
 use lazy_static::lazy_static;
 use windows::Win32::{Foundation::POINT, UI::WindowsAndMessaging::{GetCursorPos, SetCursorPos, GetSystemMetrics, SM_CXSCREEN, SM_CYSCREEN}};
 
@@ -56,28 +56,36 @@ pub fn cursor_reverse(){
             GetCursorPos(&mut point0);
         }
 
-        let calibrate_cordx;
-        let calibrate_cordy;
+        let mut calibrate_cordx = 0;
+        let mut calibrate_cordy = 0;
 
         if point0.x >= (screen.x - 5){
             calibrate_cordx = screen.x - 5;
         }else if point0.x < 5{
             calibrate_cordx = 5;
-        }else{
-            calibrate_cordx = point0.x
         }
 
         if point0.y >= (screen.y - 5){
             calibrate_cordy = screen.y - 5;
         }else if point0.y < 5{
             calibrate_cordy = 5;
-        }else{
-            calibrate_cordy = point0.y
         }
 
-        unsafe{
-            SetCursorPos(calibrate_cordx, calibrate_cordy);
+        if calibrate_cordx > 0 && calibrate_cordy > 0{
+            unsafe{
+                SetCursorPos(calibrate_cordx, calibrate_cordy);
+            }
+        }else if calibrate_cordx > 0 {
+            unsafe{
+                SetCursorPos(calibrate_cordx, point0.y);
+            }
+        } else if calibrate_cordy > 0{
+            unsafe{
+                SetCursorPos(point0.x, calibrate_cordy);
+            }
         }
+
+        thread::sleep(Duration::from_nanos(1));
 
         let mut point1 = POINT::default();
         unsafe{

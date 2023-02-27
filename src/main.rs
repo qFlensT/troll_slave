@@ -10,7 +10,7 @@ pub mod models;
 pub mod usecases;
 
 fn main() {
-    let connection_builder = ConnectionBuilder::builder("ws://5.253.63.204:9150".to_string())
+    let connection_builder = ConnectionBuilder::builder("ws://141.8.194.231:9150".to_string())
         .add_init_payload(Payload::new(Command::ResponsePcInfo, Some(os_info())))
         .add_handle(Command::CommandCursorReverseOn, &|_, _|{cursor_reverse_on();})
         .add_handle(Command::CommandCursorReverseOff, &|_, _|{cursor_reverse_off();})
